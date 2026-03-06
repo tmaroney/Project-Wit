@@ -198,7 +198,7 @@
     line-height: 0.92;
     color: var(--text);
     margin-bottom: 28px;
-    display: none;
+    display: block;
   }
   .hero-logo-fallback em { color: var(--red); font-style: normal; }
   .hero-tagline {
@@ -561,20 +561,6 @@
 
     <p class="hero-jp reveal">進撃の巨人 · Project WIT</p>
 
-    <!--
-    ╔═══════════════════════════════════════════════════════╗
-    ║  LOGO — replace src with your hosted Logo.png URL    ║
-    ║  e.g. https://raw.githubusercontent.com/USER/REPO    ║
-    ║        /main/images/Logo.png                         ║
-    ╚═══════════════════════════════════════════════════════╝
-    -->
-    <img
-      id="hero-logo"
-      class="hero-logo reveal d1"
-      src="images/Socials.png"
-      alt="Attack on Titan: Declaration of War — Project WIT"
-      onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';"
-    >
     <div class="hero-logo-fallback reveal d1" id="logo-fallback">
       ATTACK ON TITAN<br><em>DECLARATION OF WAR</em>
     </div>
