@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project WIT — Attack on Titan: Declaration of War</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #c0392b;
+    --red-dark: #8b1a1a;
+    --bg: #080808;
+    --bg2: #0f0f0f;
+    --bg3: #141414;
+    --text: #f0ede8;
+    --text2: #a8a09a;
+    --text3: #5c5650;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: overlay;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--red); }
+
+  /* ── NAV ───────────────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 0 60px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.4s, border-color 0.4s;
+    border-bottom: 1px solid transparent;
+  }
+  nav.scrolled {
+    background: rgba(8,8,8,0.96);
+    backdrop-filter: blur(12px);
+    border-color: var(--border);
+  }
+  .nav-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .nav-brand span { color: var(--red); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text2);
+    text-decoration: none;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--red);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ── SCROLL REVEAL ─────────────────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
+                transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .d1 { transition-delay: 0.1s; }
+  .d2 { transition-delay: 0.2s; }
+  .d3 { transition-delay: 0.3s; }
+
+  /* ── SECTION SHARED ────────────────────────────────────── */
+  .section-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 120px 60px;
+  }
+  .section-border { border-top: 1px solid var(--border); }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 28px; height: 1px;
+    background: var(--red);
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 6vw, 80px);
+    letter-spacing: 0.04em;
+    line-height: 0.95;
+    color: var(--text);
+    margin-bottom: 56px;
+  }
+
+  /* ── HERO ──────────────────────────────────────────────── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-ghost {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(140px, 22vw, 320px);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(192,57,43,0.11);
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero-accent-line {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, transparent, var(--red) 40%, transparent);
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    padding: 0 80px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .hero-jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    letter-spacing: 0.28em;
+    color: var(--red);
+    margin-bottom: 28px;
+  }
+  /* ── Logo image: replace src ── */
+  .hero-logo {
+    display: block;
+    max-height: 130px;
+    max-width: 580px;
+    object-fit: contain;
+    object-position: left;
+    margin-bottom: 28px;
+  }
+  .hero-logo-fallback {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(44px, 6vw, 88px);
+    letter-spacing: 0.03em;
+    line-height: 0.92;
+    color: var(--text);
+    margin-bottom: 28px;
+    display: none;
+  }
+  .hero-logo-fallback em { color: var(--red); font-style: normal; }
+  .hero-tagline {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 64px;
+    max-width: 460px;
+    line-height: 1.8;
+    border-left: 2px solid var(--red);
+    padding-left: 16px;
+  }
+  .hero-stats { display: flex; flex-wrap: wrap; }
+  .hero-stat {
+    padding: 20px 48px 20px 0;
+    border-right: 1px solid var(--border);
+    margin-right: 48px;
+  }
+  .hero-stat:last-child { border-right: none; margin-right: 0; }
+  .hero-stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .hero-stat-val span { color: var(--red); }
+  .hero-stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px; left: 80px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text3);
+    z-index: 1;
+  }
+  .hero-scroll-line {
+    width: 40px; height: 1px;
+    background: var(--text3);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { width: 40px; opacity: 0.5; }
+    50%      { width: 64px; opacity: 1; }
+  }
+
+  /* ── ABOUT ─────────────────────────────────────────────── */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .about-body p {
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--text2);
+    margin-bottom: 20px;
+  }
+  .about-body p strong { color: var(--text); font-weight: 600; }
+  .metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .metric-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 36px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--red);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .metric-card:hover { border-color: rgba(192,57,43,0.3); }
+  .metric-card:hover::before { opacity: 1; }
+  .metric-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .metric-val span { color: var(--red); }
+  .metric-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .metric-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* ── VIDEOS ────────────────────────────────────────────── */
+  .videos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .video-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .video-card:hover { border-color: rgba(192,57,43,0.3); }
+  .video-card.featured { grid-column: span 2; }
+  .video-embed {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    overflow: hidden;
+  }
+  .video-embed video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+  .video-info {
+    padding: 20px 24px 18px;
+    border-top: 1px solid var(--border);
+  }
+  .video-info h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .video-note {
+    font-size: 11px;
+    color: var(--red);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ── GALLERY ───────────────────────────────────────────── */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .img-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .img-card:hover { border-color: rgba(192,57,43,0.25); }
+  .img-card.wide   { grid-column: span 3; }
+  .img-card.double { grid-column: span 2; }
+  .img-frame {
+    position: relative;
+    overflow: hidden;
+    min-height: 240px;
+  }
+  .img-card.wide .img-frame   { min-height: 180px; }
+  .img-card.double .img-frame { min-height: 300px; }
+  .img-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+    position: absolute;
+    inset: 0;
+  }
+  .img-card:hover .img-frame img { transform: scale(1.04); }
+  .img-hover-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(192,57,43,0);
+    transition: background 0.3s;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .img-card:hover .img-hover-overlay { background: rgba(192,57,43,0.1); }
+  .img-label {
+    padding: 14px 18px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .img-label span {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .stat-callout {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    background: rgba(8,8,8,0.92);
+    border: 1px solid var(--red);
+    padding: 12px 16px;
+    z-index: 3;
+    backdrop-filter: blur(8px);
+  }
+  .callout-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--red);
+    line-height: 1;
+  }
+  .callout-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+  .callout-divider {
+    border: none;
+    border-top: 1px solid rgba(192,57,43,0.3);
+    margin: 8px 0;
+  }
+
+  /* ── FOOTER ────────────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 64px 80px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .footer-ghost {
+    position: absolute;
+    bottom: -20px; right: -10px;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 160px;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(192,57,43,0.07);
+    user-select: none;
+    pointer-events: none;
+    line-height: 1;
+  }
+  .footer-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+  }
+  .footer-jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--red);
+    opacity: 0.8;
+    margin-bottom: 12px;
+  }
+  .footer-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .footer-sub {
+    font-size: 12px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    line-height: 1.9;
+  }
+  .footer-credit {
+    text-align: right;
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.15em;
+    line-height: 2;
+  }
+  .footer-credit a {
+    color: var(--red);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+  .footer-credit a:hover { opacity: 1; }
+  .footer-divider {
+    width: 100%; height: 1px;
+    background: var(--border);
+    margin-bottom: 20px;
+    position: relative; z-index: 1;
+  }
+  .footer-disclaimer {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    line-height: 1.9;
+    opacity: 0.6;
+    max-width: 900px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── RESPONSIVE ────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .hero-content { padding: 0 32px; }
+    .section-wrap { padding: 80px 24px; }
+    .about-grid { grid-template-columns: 1fr; gap: 48px; }
+    .videos-grid { grid-template-columns: 1fr; }
+    .video-card.featured { grid-column: span 1; }
+    .gallery-grid { grid-template-columns: 1fr; }
+    .img-card.wide, .img-card.double { grid-column: span 1; }
+    footer { padding: 48px 32px 40px; }
+    .footer-inner { flex-direction: column; gap: 32px; align-items: flex-start; }
+    .footer-credit { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══════════════════════════════════════════════════ -->
+<nav id="nav">
+  <a href="#hero" class="nav-brand">PROJECT<span>WIT</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#videos">Videos</a></li>
+    <li><a href="#gallery">Receipts</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ═════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-ghost" aria-hidden="true">WIT</div>
+  <div class="hero-accent-line"></div>
+  <div class="hero-content">
+
+    <p class="hero-jp reveal">進撃の巨人 · Project WIT</p>
+
+    <!--
+    ╔═══════════════════════════════════════════════════════╗
+    ║  LOGO — replace src with your hosted Logo.png URL    ║
+    ║  e.g. https://raw.githubusercontent.com/USER/REPO    ║
+    ║        /main/images/Logo.png                         ║
+    ╚═══════════════════════════════════════════════════════╝
+    -->
+    <img
+      id="hero-logo"
+      class="hero-logo reveal d1"
+      src="REPLACE_WITH_LOGO_URL"
+      alt="Attack on Titan: Declaration of War — Project WIT"
+      onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';"
+    >
+    <div class="hero-logo-fallback reveal d1" id="logo-fallback">
+      ATTACK ON TITAN<br><em>DECLARATION OF WAR</em>
+    </div>
+
+    <p class="hero-tagline reveal d2">
+      A self-funded fan animation production.<br>
+      Recreating the Declaration of War arc<br>
+      with professional-grade craft.
+    </p>
+
+    <div class="hero-stats reveal d3">
+      <div class="hero-stat">
+        <div class="hero-stat-val">1M<span>+</span></div>
+        <div class="hero-stat-label">Total Views</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">7K<span>+</span></div>
+        <div class="hero-stat-label">Followers</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">4</div>
+        <div class="hero-stat-label">Productions</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-val">3</div>
+        <div class="hero-stat-label">Years Active</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <div class="hero-scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- ══ ABOUT ════════════════════════════════════════════════ -->
+<div class="section-border">
+  <div class="section-wrap" id="about">
+    <div class="section-label reveal">The Project</div>
+    <h2 class="section-title reveal d1">About<br>Project WIT</h2>
+    <div class="about-grid">
+      <div class="about-body reveal d1">
+        <p><strong>Attack on Titan: Declaration of War</strong> is a fan-produced animated recreation of one of the most pivotal arcs in the Attack on Titan saga — fully voiced, fully animated, and produced without studio backing.</p>
+        <p>Built entirely on community passion and <strong>self-funded production</strong>, Project WIT has spent three years assembling a crew of dedicated animators, voice actors, composers, and artists to bring this arc to life with cinematic fidelity.</p>
+        <p>From storyboards to final composite, every frame is crafted with respect for Hajime Isayama's vision — and an ambition to prove what independent fan animation can achieve when talent and determination converge.</p>
+        <p>No sponsorships. No monetization. Pure craft.</p>
+      </div>
+      <div class="metric-grid reveal d2">
+        <div class="metric-card">
+          <div class="metric-val">1M<span>+</span></div>
+          <div class="metric-label">Total Views</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">7K<span>+</span></div>
+          <div class="metric-label">Followers</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">120K</div>
+          <div class="metric-label">Anniversary Promo</div>
+          <div class="metric-sub">Views before takedown</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">4.07K</div>
+          <div class="metric-label">YouTube Subscribers</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VIDEOS ═══════════════════════════════════════════════ -->
+<div class="section-border" id="videos" style="background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);">
+  <div class="section-wrap">
+    <div class="section-label reveal">Productions</div>
+    <h2 class="section-title reveal d1">Video<br>Archive</h2>
+    <div class="videos-grid reveal d2">
+
+      <!--
+      ╔═════════════════════════════════════════════════════════╗
+      ║  VIDEO 1 (FEATURED) — Declaration of War: Japanese     ║
+      ║  Replace src="REPLACE_..." with your Git LFS URL:      ║
+      ║  https://media.githubusercontent.com/media/USER/REPO   ║
+      ║  /main/videos/japanese-version.mp4                     ║
+      ╚═════════════════════════════════════════════════════════╝
+      -->
+      <div class="video-card featured">
+        <div class="video-embed">
+          <video controls preload="metadata"
+            src="REPLACE_WITH_JAPANESE_VERSION_URL">
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+        <div class="video-info">
+          <h3>Declaration of War — Japanese Version</h3>
+          <div class="video-note">Featured Production</div>
+        </div>
+      </div>
+
+      <!--
+      ╔═════════════════════════════════════════════════════════╗
+      ║  VIDEO 2 — Declaration of War: English Version         ║
+      ╚═════════════════════════════════════════════════════════╝
+      -->
+      <div class="video-card">
+        <div class="video-embed">
+          <video controls preload="metadata"
+            src="REPLACE_WITH_ENGLISH_VERSION_URL">
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+        <div class="video-info">
+          <h3>Declaration of War — English Version</h3>
+        </div>
+      </div>
+
+      <!--
+      ╔═════════════════════════════════════════════════════════╗
+      ║  VIDEO 3 — AOT 10 Year Anniversary Promo               ║
+      ╚═════════════════════════════════════════════════════════╝
+      -->
+      <div class="video-card">
+        <div class="video-embed">
+          <video controls preload="metadata"
+            src="REPLACE_WITH_ANNIVERSARY_URL">
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+        <div class="video-info">
+          <h3>AOT 10 Year Anniversary Promotional Video</h3>
+          <div class="video-note">120K views before takedown</div>
+        </div>
+      </div>
+
+      <!--
+      ╔═════════════════════════════════════════════════════════╗
+      ║  VIDEO 4 — Declaration of War: Teaser                  ║
+      ╚═════════════════════════════════════════════════════════╝
+      -->
+      <div class="video-card">
+        <div class="video-embed">
+          <video controls preload="metadata"
+            src="REPLACE_WITH_TEASER_URL">
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+        <div class="video-info">
+          <h3>Declaration of War — Teaser</h3>
+          <div class="video-note">52K views before takedown</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ GALLERY / RECEIPTS ════════════════════════════════════ -->
+<div class="section-border">
+  <div class="section-wrap" id="gallery">
+    <div class="section-label reveal">Evidence</div>
+    <h2 class="section-title reveal d1">Receipts</h2>
+    <div class="gallery-grid reveal d2">
+
+      <!--
+      ┌───────────────────────────────────────────────────────┐
+      │  IMAGE 1 — Fan Animation Thumbnail                    │
+      │  Replace src with your direct image URL               │
+      └───────────────────────────────────────────────────────┘
+      -->
+      <div class="img-card">
+        <div class="img-frame">
+          <img src="REPLACE_WITH_THUMBNAIL_URL" alt="Fan Animation Thumbnail">
+          <div class="img-hover-overlay"></div>
+        </div>
+        <div class="img-label"><span>Fan Animation Thumbnail</span></div>
+      </div>
+
+      <!--
+      ┌───────────────────────────────────────────────────────┐
+      │  IMAGE 2 — YouTube Channel Screenshot                 │
+      └───────────────────────────────────────────────────────┘
+      -->
+      <div class="img-card">
+        <div class="img-frame">
+          <img src="REPLACE_WITH_YOUTUBE_CHANNEL_URL" alt="YouTube Channel Screenshot">
+          <div class="img-hover-overlay"></div>
+        </div>
+        <div class="img-label"><span>YouTube Channel</span></div>
+      </div>
+
+      <!--
+      ┌───────────────────────────────────────────────────────┐
+      │  IMAGE 3 — Channel Description & Links                │
+      └───────────────────────────────────────────────────────┘
+      -->
+      <div class="img-card">
+        <div class="img-frame">
+          <img src="REPLACE_WITH_CHANNEL_DESCRIPTION_URL" alt="Channel Description & Links">
+          <div class="img-hover-overlay"></div>
+        </div>
+        <div class="img-label"><span>Channel Description & Links</span></div>
+      </div>
+
+      <!--
+      ┌───────────────────────────────────────────────────────┐
+      │  IMAGE 4 — YouTube Studio Analytics (double width)    │
+      │  Stat callout numbers are hardcoded below             │
+      └───────────────────────────────────────────────────────┘
+      -->
+      <div class="img-card double">
+        <div class="img-frame">
+          <img src="REPLACE_WITH_ANALYTICS_SCREENSHOT_URL" alt="YouTube Studio Analytics Panel">
+          <div class="img-hover-overlay"></div>
+          <div class="stat-callout">
+            <div class="callout-val">100.6K</div>
+            <div class="callout-label">Views in 6 days</div>
+            <hr class="callout-divider">
+            <div class="callout-val" style="font-size:22px; color:var(--text);">84.8K</div>
+            <div class="callout-label">Above baseline</div>
+          </div>
+        </div>
+        <div class="img-label"><span>YouTube Studio Analytics</span></div>
+      </div>
+
+      <!--
+      ┌───────────────────────────────────────────────────────┐
+      │  IMAGE 5 — Subscriber Count                           │
+      └───────────────────────────────────────────────────────┘
+      -->
+      <div class="img-card">
+        <div class="img-frame">
+          <img src="REPLACE_WITH_SUBSCRIBER_COUNT_URL" alt="Subscriber Count">
+          <div class="img-hover-overlay"></div>
+        </div>
+        <div class="img-label"><span>Subscriber Count</span></div>
+      </div>
+
+      <!--
+      ┌───────────────────────────────────────────────────────┐
+      │  IMAGE 6 — Project WIT Channel Banner (full width)    │
+      └───────────────────────────────────────────────────────┘
+      -->
+      <div class="img-card wide">
+        <div class="img-frame">
+          <img src="REPLACE_WITH_CHANNEL_BANNER_URL" alt="Project WIT Channel Banner">
+          <div class="img-hover-overlay"></div>
+        </div>
+        <div class="img-label"><span>Project WIT Channel Banner</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ═══════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-ghost" aria-hidden="true">進撃</div>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-jp">進撃の巨人 · 宣戦布告</div>
+      <div class="footer-brand">Project WIT</div>
+      <div class="footer-sub">
+        Attack on Titan: Declaration of War<br>
+        Co-produced with Studio Eclypse
+      </div>
+    </div>
+    <div class="footer-credit">
+      Self-funded fan production<br>
+      Non-commercial · No affiliation<br>
+      <a href="#">Studio Eclypse</a>
+    </div>
+  </div>
+  <div class="footer-divider"></div>
+  <p class="footer-disclaimer">
+    Attack on Titan / Shingeki no Kyojin © Hajime Isayama · Kodansha. Anime adaptation © MAPPA / Wit Studio.
+    This is a non-commercial fan production. Project WIT is not affiliated with, endorsed by, or sponsored by any rights holders.
+    No monetization. All rights to the original work remain with their respective holders.
+  </p>
+</footer>
+
+<script>
+  // Nav scroll effect
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 80);
+  }, { passive: true });
+
+  // Scroll reveal
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
